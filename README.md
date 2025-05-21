@@ -1,35 +1,69 @@
 # devops-day-2025-linux-workshop
 
-## Configurar DNS
+## Configurar IP elástica y DNS
 
 - En AWS crear IP elástica.
-- Asociar IP elástica a DNS
+- Asociar IP elástica a DNS:
+    - Godaddy
+    - Cloudfare
 
-
-## Configure una instance en AWS
+## Configure una instance EC2 en AWS
 
 - Crear instance EC2
+- Elegir distribución de Linux
 - Asociar rol IAM
 - Conectar a la instancia a través de ssh
 - Usar llave privada para conectarse
 - Aplicar permisos
+
 ```bash
     chdmod 400
 ```
 
 ## Usuarios y Grupos de usuarios
 
-- Crear un usuario
+- Crear un usuario con el directorio home/jhorman
+
 ```bash
-useradd jhorman
+sudo useradd -m jhorman
+```
+- Crear usuario con terminal bash por defecto
+
+```bash
+sudo useradd -m jhorman -s /bin/bash
 ```
 
-- Agregar usuarios a grupo sudo
+- Crear una contraseña al usuario
 ```bash
-usermod -G sudo -a jhorman
+sudo passwd jhorman
 ```
 
-# Creación de scripts y permisos
+- Obtener ayuda sobre un comando
+
+```bash
+useradd -- help
+```
+
+```bash
+man useradd
+```
+- Para cambiar de usuario:
+
+```bash
+su jhorman
+```
+
+- Agregar usuarios a un grupo
+```bash
+usermod -a jhorman -G sudo 
+```
+- Revisar los usuarios que pertenecen al grupo sudo
+
+```bash
+sudo cat /etc/group | grep sudo
+```
+
+## Creación de scripts y permisos
 - Crear un script para instalar diferentes paquetes
 ```bash
 #!/bin/bash
@@ -38,14 +72,17 @@ sudo apt upgrade -y
 sudo apt install nginx -y
 sudo apt install certbot python3-certbot-nginx -y
 sudo apt install uwsgi uwsgi-plugin-python3 -y
-sudo apt install python3-pip -y
-sudo apt install python3-virtualenv
-sudo apt install mariadb-server -y
+
 ```
 - Revisar los permisos del script
 ```bash
 ls -l
 ```
+- Los permisos se pueden asignar a:
+  - Usuario: propietario del archivo o directorio
+  - Grupo de usuario: grupo al que pertenece el archivo o directorio
+  - Otros: usuarios que no son propietarios ni pertenecen a un solo grupo. 
+
 - Habilitar permisos de ejecución
 ```bash
 sudo chmod +x script.sh 

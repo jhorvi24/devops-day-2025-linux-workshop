@@ -195,16 +195,13 @@ resource "aws_instance" "bookstore-app_server" {
 #!/bin/bash
 sudo apt update
 sudo apt upgrade -y
-sudo apt install nginx -y
-sudo apt install certbot python3-certbot-nginx -y
-sudo apt install uwsgi uwsgi-plugin-python3 -y
 sudo apt install python3-pip -y
 sudo apt install python3-virtualenv -y
 sudo apt install mariadb-server -y
 git clone https://github.com/jhorvi24/bookstore-python-flask.git
 echo "Cloning repository"
 DB_PATH="/bookstore-python-flask/databases"
-echo 'export db_path="/bookstore-python-flask/databases"' >> /home/ubuntu/.bashrc
+echo 'export DB_PATH="/bookstore-python-flask/databases"' >> /home/ubuntu/.bashrc
 source /home/ubuntu/.bashrc
 
 
