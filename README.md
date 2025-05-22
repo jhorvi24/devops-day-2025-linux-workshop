@@ -2,7 +2,7 @@
 
 # DevOps Day Medellín 2025 🚀
 
-![arquitectura aws](img/EC2-RDS.svg)
+
 
 ## Índice
 
@@ -19,6 +19,8 @@
 11. [Crear bases de datos RDS](#crear-bases-de-datos-rds) 🗄️
 
 ---
+
+![arquitectura aws](img/EC2-RDS.svg)
 
 ### Configurar IP elástica y DNS 🌐
 
