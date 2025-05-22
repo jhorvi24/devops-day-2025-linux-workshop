@@ -161,7 +161,7 @@ resource "aws_security_group" "databases-sg" {
       description = "Allow traffic from webserver"
       from_port = 3306
       to_port = 3306
-      protocol = "tcp"
+      protocol = "tcp"      
       security_groups = [aws_security_group.web-server-sg.id]
     }
 
@@ -195,6 +195,10 @@ resource "aws_instance" "bookstore-app_server" {
 #!/bin/bash
 sudo apt update
 sudo apt upgrade -y
+sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt install unzip -y
+sudo unzip awscliv2.zip
+sudo ./aws/install
 sudo apt install python3-pip -y
 sudo apt install python3-virtualenv -y
 sudo apt install mariadb-server -y
@@ -208,21 +212,22 @@ source /home/ubuntu/.bashrc
 if [ -d "bookstore-python-flask" ]; then
 
   echo "Cloned successfully"
+  echo $DB_PATH
 
-  sudo chmod +x DB_PATH/*.sh
+  sudo chmod +x $DB_PATH/*.sh
 
-  if [ -f "DB_PATH/set-root-user.sh" ]; then
+  if [ -f "$DB_PATH/set-root-user.sh" ]; then
 
-    sudo DB_PATH/set-root-user.sh
+    sudo $DB_PATH/set-root-user.sh
   else
 
     echo "No file set-root-user.sh found."
     exit 1
   fi
 
-  if [ -f "DB_PATH/createdb.sh" ]; then
+  if [ -f "$DB_PATH/createdb.sh" ]; then
 
-    sudo DB_PATH/createdb.sh
+    sudo $DB_PATH/createdb.sh
 
   else
     echo "No file createdb.sh found."
@@ -230,9 +235,14 @@ if [ -d "bookstore-python-flask" ]; then
 
   DB_PASSWORD=$(aws ssm get-parameter --name "/bookstore/password" --with-decryption --query "Parameter.Value" --output text --region "us-east-1")
   sudo mysqldump --databases bookstore_db -u root -p$DB_PASSWORD > BookDbDump.sql
-  rds_endpoint=${aws_db_instance.bookstore_db.address}
-  echo $rds_endpoint
-  mysql -u root -p$DB_PASSWORD --host ${aws_db_instance.bookstore_db.address} < BookDbDump.sql
+  RDS_ENDPOINT=$(aws ssm get-parameter --name "/bookstore/host" --query "Parameter.Value" --output text --region "us-east-1")
+  echo $RDS_ENDPOINT
+  RDS_HOST=$(echo $RDS_ENDPOINT | cut -d: -f1)
+  echo $RDS_HOST  
+  RDS_USER=$(aws ssm get-parameter --name "/bookstore/user" --query "Parameter.Value" --output text --region "us-east-1")
+  echo $RDS_USER
+  mysql -u $RDS_USER -p$DB_PASSWORD --host $RDS_HOST < BookDbDump.sql
+  echo "export RDS_HOST=\"$RDS_HOST\"" >> /home/ubuntu/.bashrc
 
 
 else
