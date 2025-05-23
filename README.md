@@ -98,20 +98,21 @@
 *   **Agregar usuario a un grupo (por ejemplo, sudo):**
 
     ```bash
-    sudo usermod -aG sudo jhorman
+    sudo usermod -a jhorman -G sudo 
     ```
 
-*   **Ver usuarios en el grupo sudo:**
+*   **Ver usuarios asignados al grupo sudo:**
 
     ```bash
-    getent group sudo
+    sudo cat /etc/group | grep sudo
+    
     ```
 
 ---
 
 ### Creación de scripts y permisos 📜
 
-*   **Crear un script para instalar paquetes:**
+*   **Crear un script para instalar paquetes usando el editor de texto vi o nano:**
 
     ```bash
     nano script.sh
@@ -151,6 +152,7 @@
 ### Configurar Nginx ⚙️
 
 *   **Crear archivo de configuración** en `/etc/nginx/sites-available/cafecloud.xyz`:
+    - Una buena práctica es denominarlo igual que el nombre de dominio. 
 
     ```nginx
     server {
@@ -167,14 +169,14 @@
 *   **Crear enlace simbólico** en `/etc/nginx/sites-enabled`:
 
     ```bash
-    sudo ln -s /etc/nginx/sites-available/cafecloud.xyz /etc/nginx/sites-enabled/
+    sudo ln -s ../sites-available/cafecloud.xyz 
     ```
 
 *   **Probar configuración y reiniciar Nginx:**
 
     ```bash
     sudo nginx -t
-    sudo systemctl restart nginx
+    sudo service nginx restart
     ```
 
 *   **Configurar certificado SSL/TLS con Certbot:**
@@ -187,7 +189,9 @@
 
 ### Clonar repositorio de GitHub 🐙
 
-*   **Mover el repositorio al home del usuario:**
+- Durante el inicio de la instancia EC2 el repositorio fue clonado dada la configuración del user data.
+
+*   **Mover el repositorio del directorio raiz al home del usuario:**
 
     ```bash
     sudo mv bookstore-python-flask /home/jhorman
@@ -203,7 +207,7 @@
 
     ```bash
     cd /home/jhorman/bookstore-python-flask
-    python3 -m venv venv
+    python3 -m virtualenv venv
     source venv/bin/activate
     pip install -r requirements.txt
     ```
@@ -231,10 +235,10 @@
     socket = /tmp/cafecloud.sock
     ```
 
-*   **Crear enlace simbólico en apps-enabled:**
+*   **Crear enlace simbólico en /etc/uwsgi/apps-enabled:**
 
     ```bash
-    sudo ln -s /etc/uwsgi/apps-available/cafecloud.ini /etc/uwsgi/apps-enabled/
+    sudo ln -s ../apps-available/cafecloud.ini 
     ```
 
 *   **Ver procesos activos:**
@@ -275,29 +279,35 @@
 
     ```bash
     sudo nginx -t
-    sudo systemctl restart nginx
-    sudo systemctl restart uwsgi
+    sudo service nginx restart
+    sudo service uwsgi restart
     ```
 
 ---
 
 ### Probar aplicación web ✅
 
-*   Accede a la aplicación desde el navegador usando el dominio configurado en el DNS.
+*   Accede a la aplicación desde el navegador usando tu dominio.
 
 ---
 
 ### Crear bases de datos RDS 🗄️
 
-*   **Asignar nombre a la instancia RDS en `/etc/hosts`:**
+*   ** La base de datos fue configurada en el archivo terraform y en el user data de AWS EC2 se hizo la migración a RDS
+    
+    **Asignar nombre a la instancia RDS en `/etc/hosts`:**
 
     1.  Obtener la IP de la instancia RDS:
 
+        - Durante el inicio de la instancia se configuró una variable de entorno donde se asignó el EndPoint de la base de datos en RDS
+
         ```bash
-        dig rds-endpoint
+        dig $RDS_HOST
         ```
 
     2.  Editar `/etc/hosts` y agregar:
+
+        - La IP debe ser cambiada por la que se asignó a la instancia donde corre la base de datos. 
 
         ```
         127.0.0.1   localhost
