@@ -293,7 +293,7 @@
 
 ### Crear bases de datos RDS 🗄️
 
-*   ** La base de datos fue configurada en el archivo terraform y en el user data de AWS EC2 se hizo la migración a RDS
+*   - La base de datos fue configurada en el archivo terraform y en el user data de AWS EC2 se hizo la migración a RDS
     
     **Asignar nombre a la instancia RDS en `/etc/hosts`:**
 
